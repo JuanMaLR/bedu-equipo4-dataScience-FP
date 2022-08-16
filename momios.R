@@ -87,8 +87,7 @@ d1920S <- mutate(d1920S, Date = as.Date(Date, format = "%d/%m/%Y"))
 d1019S <- rbind(d1011S, d1112S, d1213S, d1314S, d1415S, d1516S, d1617S, d1718S, d1819S)
 
 # Renombrar columnas
-
-d1019S <- rename(d1019S,  Max.2.5.O = BbMx.2.5, 
+d1019S <- dplyr::rename(d1019S,  Max.2.5.O = BbMx.2.5, 
                  Avg.2.5.O = BbAv.2.5, 
                  Max.2.5.U = BbMx.2.5.1,
                  Avg.2.5.U = BbAv.2.5.1)
@@ -259,3 +258,4 @@ p <- ggplot(g, aes(x=Num_Ap, y=Capital)) + geom_line( color="purple") + geom_poi
   theme(axis.text.x = element_text(face = "bold", color="blue" , size = 10, angle = 25, hjust = 1),
         axis.text.y = element_text(face = "bold", color="blue" , size = 10, angle = 25, hjust = 1))  # color, ángulo y estilo de las abcisas y ordenadas 
 p
+

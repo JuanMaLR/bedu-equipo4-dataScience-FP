@@ -39,7 +39,7 @@ ui <- fluidPage(
                    titlePanel(h3(textOutput("output_text"))), 
                    selectInput("x", "Selecciona el eje de las X",
                                choices = c('Local', 'Visitante')),
-                   plotOutput("output_plot") 
+                   plotOutput("output_plot", height = "700px") 
                 )),
         tabItem(tabName = "imagenesHistogramas",
                 fluidRow(
@@ -80,9 +80,10 @@ server <- function(input, output) {
   }) 
   
   #Pestaña 2
-  #Obtener frecuencias absolutas
-  home.score <- table(md$home.score)
-  away.score <- table(md$away.score)
+  #Obtener tablas de frecuencias absolutas/equipos/FTR (H = casa ganó, A =
+  #visita ganó, D = empate)
+  home.score <- table(md$home.team, md$home.score, md$FTR)
+  away.score <- table(md$away.team, md$away.score, md$FTR)
   
   #Convertir a data frame para poder graficar
   home.score <- as.data.frame(home.score)
@@ -95,10 +96,12 @@ server <- function(input, output) {
   #Graficar según input
   output$output_plot <- renderPlot({
     ggplot(data()) +
-    aes(x = Var1, y = Freq) + 
-    geom_bar(stat="identity", fill = 'blue') + 
-    ggtitle(paste("Goles del equipo ", tolower(selector()))) +
-    labs(x = paste('Goles equipo ', tolower(selector())), y = 'Frecuencia absoluta')
+    aes(x = Var2, y = Freq, fill = Var3) + 
+    geom_bar(stat="identity") + 
+    facet_wrap(data()$Var1) +
+    ggtitle(paste("Goles del equipo", tolower(selector()))) +
+    labs(x = paste('Clasificación de goles anotados por partido del equipo', tolower(selector())), 
+         y = 'Frecuencia de partidos dónde se anotaron x goles', fill = 'FTR')
   })
   
   #Pestaña 3

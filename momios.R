@@ -57,16 +57,17 @@ d1718 <- read.csv("SP1-1718.csv")
 d1819 <- read.csv("SP1-1819.csv")
 d1920 <- read.csv("SP1-1920.csv")
 
-d1011S <- select(d1011, Date:FTAG, BbMx.2.5:BbAv.2.5.1)
-d1112S <- select(d1112, Date:FTAG, BbMx.2.5:BbAv.2.5.1)
-d1213S <- select(d1213, Date:FTAG, BbMx.2.5:BbAv.2.5.1)
-d1314S <- select(d1314, Date:FTAG, BbMx.2.5:BbAv.2.5.1)
-d1415S <- select(d1415, Date:FTAG, BbMx.2.5:BbAv.2.5.1)
-d1516S <- select(d1516, Date:FTAG, BbMx.2.5:BbAv.2.5.1)
-d1617S <- select(d1617, Date:FTAG, BbMx.2.5:BbAv.2.5.1)
-d1718S <- select(d1718, Date:FTAG, BbMx.2.5:BbAv.2.5.1)
-d1819S <- select(d1819, Date:FTAG, BbMx.2.5:BbAv.2.5.1)
-d1920S <- select(d1920, Date:FTAG, Max.2.5:Avg.2.5.1)
+#Agregar variable de FTR
+d1011S <- select(d1011, Date:FTR, BbMx.2.5:BbAv.2.5.1)
+d1112S <- select(d1112, Date:FTR, BbMx.2.5:BbAv.2.5.1)
+d1213S <- select(d1213, Date:FTR, BbMx.2.5:BbAv.2.5.1)
+d1314S <- select(d1314, Date:FTR, BbMx.2.5:BbAv.2.5.1)
+d1415S <- select(d1415, Date:FTR, BbMx.2.5:BbAv.2.5.1)
+d1516S <- select(d1516, Date:FTR, BbMx.2.5:BbAv.2.5.1)
+d1617S <- select(d1617, Date:FTR, BbMx.2.5:BbAv.2.5.1)
+d1718S <- select(d1718, Date:FTR, BbMx.2.5:BbAv.2.5.1)
+d1819S <- select(d1819, Date:FTR, BbMx.2.5:BbAv.2.5.1)
+d1920S <- select(d1920, Date:FTR, Max.2.5:Avg.2.5.1)
 d1920S <- select(d1920S, -Time)
 #colnames(d1718S); colnames(d1819S); colnames(d1920S)
 
@@ -111,13 +112,15 @@ d1020S <- rename(d1020S, date = Date, home.team = HomeTeam, home.score = FTHG, a
 
 # Ordenamos columnas
 
-data <- select(d1020S, date, home.team, home.score, away.team, away.score:Avg.2.5.U) # Este data frame contiene todos los datos necesarios
+#Added FTR
+data <- select(d1020S, date, home.team, home.score, away.team, away.score, FTR:Avg.2.5.U) # Este data frame contiene todos los datos necesarios
 
 head(data, n = 2L); tail(data, n = 2L)
 
 # Data frames de partidos y equipos
 
-md <- data %>% select(date:away.score)
+#Added FTR
+md <- data %>% select(date:FTR)
 write.csv(md, "match.data.csv", row.names = FALSE)
 df <- create.fbRanks.dataframes(scores.file = "match.data.csv")
 teams <- df$teams; scores <- df$scores

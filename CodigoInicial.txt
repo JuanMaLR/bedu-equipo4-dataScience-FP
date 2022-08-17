@@ -1,0 +1,90 @@
+library(shiny)
+library(ggplot2)
+library(dplyr)
+
+setwd('/Users/juanmastd/Documents/Yo/Becas/Becas Santander/BEDU/Ciencia de Datos/Fase 2/Módulo 1/bedu-equipo4-dataScience-FP')
+md <- read.csv("match.data.csv")
+
+ui <- pageWithSidebar(
+  
+  headerPanel("Proyecto final equipo 4"),
+  sidebarPanel(p("No sé que poner aquí")),
+  
+  mainPanel(
+    #Para generar pestañas en el dashboard
+    tabsetPanel(
+      
+      #Pestaña 1
+      #Una pestaña con gráficas de barras, donde en el eje de las X se muestren 
+      #los goles de local y visitante, con un menu de selección 
+      #(en choices deben aparecer éstas variables), utiliza la geometría de tipo 
+      #barras, además de hacer un facet_wrap con la variable de el equipo visitante
+      tabPanel("Gráfico de barras", 
+               h3(textOutput("output_text")), 
+               selectInput("x", "Selecciona el eje de las X",
+               choices = c('Local', 'Visitante')),
+               plotOutput("output_plot") 
+      ),
+      
+      #Pestaña 2
+      #Realiza una pestaña donde agregues las imágenes de las gráficas del postwork 3
+      tabPanel("Imágenes postwork 3",
+               img(src ="barras_casa.png", width = 450, height = 450),
+               img(src ="barras_visita.png", width = 450, height = 450),
+               img(src ="heatmap_conjuntas.png", width = 450, height = 450)
+      ), 
+      
+      #Pestaña 3
+      #En otra pestaña coloca el data table del fichero match.data.csv
+      tabPanel("Data Table", dataTableOutput("dataTable")),   # salida del data table
+      
+      #Pestaña 4
+      #Por último en otra pestaña agrega las imágenes de las gráficas de los factores 
+      #de ganancia promedio y máximo
+      tabPanel("Imágenes factores ganancia promedio y máximo",
+               img(src ="MomiosPromedio.png", width = 450, height = 450),
+               img(src ="MomiosMaximos.png", width = 450, height = 450)
+      ), 
+   
+    )
+  )
+)
+
+server <- function(input, output) {
+  
+  #Pestaña 1
+  #Texto inteligente para saber qué se está graficando
+  output$output_text <- renderText({
+    paste("Gráficos de barras de cantidad de goles del equipo ", tolower(input$x))
+  }) 
+  
+  #Pestaña 2
+  #Obtener frecuencias absolutas
+  home.score <- table(md$home.score)
+  away.score <- table(md$away.score)
+  
+  #Convertir a data frame para poder graficar
+  home.score <- as.data.frame(home.score)
+  away.score <- as.data.frame(away.score)
+  
+  selector <- reactive({input$x})
+  
+  data <- reactive(if(selector() == 'Local') home.score else away.score)
+  
+  #Graficar según input
+  output$output_plot <- renderPlot({
+    ggplot(data()) +
+    aes(x = Var1, y = Freq) + 
+    geom_bar(stat="identity", fill = 'blue') + 
+    ggtitle(paste("Goles del equipo ", tolower(selector()))) +
+    labs(x = paste('Goles equipo ', tolower(selector())), y = 'Frecuencia absoluta')
+  })
+  
+  #Pestaña 3
+  output$dataTable <- renderDataTable({md},       #Data table
+                                     options = list(aLengthMenu = c(10,20,50), 
+                                                    iDisplayLength = 10))
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)

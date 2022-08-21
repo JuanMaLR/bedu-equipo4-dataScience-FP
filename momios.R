@@ -5,7 +5,7 @@
 # 2. Instala igraphs install.packages("igraph")
 # 3. install.packages("path_absoluta_del_archivo", repos = NULL, type = "source")
 
-install.packages("C:/Users/HANNIA/Documents/pack_r_batallosos", repos = NULL, type = "source")
+install.packages("C:/Users/HANNIA/Documents/pack_r", repos = NULL, type = "source")
 install.packages("plyr") #Para pasar los datos de una lista cuyos objetos tienen la misma longitud a un dataframe
 
 library(fbRanks)
@@ -31,7 +31,8 @@ u1718 <- "https://www.football-data.co.uk/mmz4281/1718/SP1.csv"
 u1819 <- "https://www.football-data.co.uk/mmz4281/1819/SP1.csv"
 u1920 <- "https://www.football-data.co.uk/mmz4281/1920/SP1.csv"
 
-rawData <- "C:/Users/HANNIA/Documents/Cursos/[BEDU] Data Science/Fase 2/S9/postwork" #Path donde se guardarán los archivos
+#Path donde se guardarán los archivos
+rawData <- "C:/Users/HANNIA/Documents/Cursos/[BEDU] Data Science/Fase 2/S9/postwork" 
 
 download.file(url = u1011, destfile ="SP1-1011.csv", mode = "wb")
 download.file(url = u1112, destfile ="SP1-1112.csv", mode = "wb")
@@ -53,7 +54,7 @@ class(csv)
 
 names(csv) <- c("d1011", "d1112", "d1213", "d1314", "d1415", "d1516", "d1617", "d1718", "d1819", "d1920")
 
-###### Procesamiento de datos ######
+###### Depuración de datos ######
 d1920 <- as.data.frame(csv[10]) #Obtener los datos de d1920 como dataframe
 d1819 <- as.data.frame(csv[9]) #Obtener los datos de d1819 como dataframe
 class(d1920); summary(d1920)
@@ -115,7 +116,7 @@ head(d1020S); tail(d1020S) #Para verificar que abarca la información de 2010 a 
 
 d1020S <- rename(d1020S, date = Date, home.team = HomeTeam, home.score = FTHG, away.team = AwayTeam, away.score = FTAG)
 
-# Ordenamos columnas
+###### Datos depurados ######
 
 #Added FTR
 data <- select(d1020S, date, home.team, home.score, away.team, away.score, FTR:Avg.2.5.U) # Este data frame contiene todos los datos necesarios
@@ -204,6 +205,7 @@ as <- momio$away.score
 
 mean(phs + pas > 3) # proporción de partidos con más de tres goles según el modelo
 pro.2.5.O <- mean(phs + pas > 3 & hs + as > 2.5)/mean(phs + pas > 3) 
+pro.2.5.O <- round(pro.2.5.O, 2)
 # probabilidad condicional estimada de ganar en over 2.5
 mean(phs + pas < 2.1) # proporción de partidos con menos de 2.1 goles según el modelo
 prob.2.5U <- mean(phs + pas < 2.1 & hs + as < 2.5)/mean(phs + pas < 2.1) 
@@ -266,4 +268,3 @@ p <- ggplot(g, aes(x=Num_Ap, y=Capital)) + geom_line( color="purple") + geom_poi
   theme(axis.text.x = element_text(face = "bold", color="blue" , size = 10, angle = 25, hjust = 1),
         axis.text.y = element_text(face = "bold", color="blue" , size = 10, angle = 25, hjust = 1))  # color, ángulo y estilo de las abcisas y ordenadas 
 p
-

@@ -4,13 +4,18 @@
 # 1. Descárgalo del CRAN https://cran.r-project.org/src/contrib/Archive/fbRanks/fbRanks_2.0.tar.gz
 # 2. Instala igraphs install.packages("igraph")
 # 3. install.packages("path_absoluta_del_archivo", repos = NULL, type = "source")
+
+install.packages("C:/Users/HANNIA/Documents/pack_r_batallosos", repos = NULL, type = "source")
+install.packages("plyr") #Para pasar los datos de una lista cuyos objetos tienen la misma longitud a un dataframe
+
 library(fbRanks)
+library(plyr) #Importante que se lea antes de dplyr
 library(dplyr)
 library(ggplot2)
 
 # Colocar el directorio de trabajo según corresponda
 
-setwd("/Users/juanmastd/Documents/Yo/Becas/Becas Santander/BEDU/Ciencia de Datos/Fase 2/Módulo 1/bedu-equipo4-dataScience-FP")
+setwd("C:/Users/HANNIA/Documents/Cursos/[BEDU] Data Science/Fase 2/S9/postwork")
 
 # Descarga de archivos
 # https://www.football-data.co.uk/spainm.php
@@ -26,7 +31,8 @@ u1718 <- "https://www.football-data.co.uk/mmz4281/1718/SP1.csv"
 u1819 <- "https://www.football-data.co.uk/mmz4281/1819/SP1.csv"
 u1920 <- "https://www.football-data.co.uk/mmz4281/1920/SP1.csv"
 
-#RawData <- "C:\\\"
+rawData <- "C:/Users/HANNIA/Documents/Cursos/[BEDU] Data Science/Fase 2/S9/postwork" #Path donde se guardarán los archivos
+
 download.file(url = u1011, destfile ="SP1-1011.csv", mode = "wb")
 download.file(url = u1112, destfile ="SP1-1112.csv", mode = "wb")
 download.file(url = u1213, destfile ="SP1-1213.csv", mode = "wb")
@@ -40,71 +46,70 @@ download.file(url = u1920, destfile ="SP1-1920.csv", mode = "wb")
 
 # Lectura de datos
 
-#lista <- lapply(list.files(path = RawData), read.csv)
-
-# Procesamiento de datos
-
-#lista <- lapply(lista, select, Date:FTR)
-
-d1011 <- read.csv("SP1-1011.csv")
-d1112 <- read.csv("SP1-1112.csv")
-d1213 <- read.csv("SP1-1213.csv")
-d1314 <- read.csv("SP1-1314.csv")
-d1415 <- read.csv("SP1-1415.csv")
-d1516 <- read.csv("SP1-1516.csv")
-d1617 <- read.csv("SP1-1617.csv")
-d1718 <- read.csv("SP1-1718.csv")
-d1819 <- read.csv("SP1-1819.csv")
-d1920 <- read.csv("SP1-1920.csv")
-
-#Agregar variable de FTR
-d1011S <- select(d1011, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1112S <- select(d1112, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1213S <- select(d1213, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1314S <- select(d1314, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1415S <- select(d1415, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1516S <- select(d1516, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1617S <- select(d1617, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1718S <- select(d1718, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1819S <- select(d1819, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1920S <- select(d1920, Date:FTR, Max.2.5:Avg.2.5.1)
-d1920S <- select(d1920S, -Time)
-#colnames(d1718S); colnames(d1819S); colnames(d1920S)
-
-# Arreglamos las fechas
-d1011S <- mutate(d1011S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1112S <- mutate(d1112S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1213S <- mutate(d1213S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1314S <- mutate(d1314S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1415S <- mutate(d1415S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1516S <- mutate(d1516S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1617S <- mutate(d1617S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1718S <- mutate(d1718S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1819S <- mutate(d1819S, Date = as.Date(Date, format = "%d/%m/%Y"))
-d1920S <- mutate(d1920S, Date = as.Date(Date, format = "%d/%m/%Y"))
-
-# Unimos de d1415S a d1819S
-
-d1019S <- rbind(d1011S, d1112S, d1213S, d1314S, d1415S, d1516S, d1617S, d1718S, d1819S)
+csv <- lapply(list.files(path = rawData, pattern = "SP1*"), read.csv)
+class(csv)
 
 # Renombrar columnas
-d1019S <- dplyr::rename(d1019S,  Max.2.5.O = BbMx.2.5, 
-                 Avg.2.5.O = BbAv.2.5, 
-                 Max.2.5.U = BbMx.2.5.1,
-                 Avg.2.5.U = BbAv.2.5.1)
 
-d1920S <- rename(d1920S,  Max.2.5.O = Max.2.5, 
-                 Avg.2.5.O = Avg.2.5, 
-                 Max.2.5.U = Max.2.5.1,
-                 Avg.2.5.U = Avg.2.5.1)
+names(csv) <- c("d1011", "d1112", "d1213", "d1314", "d1415", "d1516", "d1617", "d1718", "d1819", "d1920")
+
+###### Procesamiento de datos ######
+d1920 <- as.data.frame(csv[10]) #Obtener los datos de d1920 como dataframe
+d1819 <- as.data.frame(csv[9]) #Obtener los datos de d1819 como dataframe
+class(d1920); summary(d1920)
+class(d1819); summary(d1819)
+
+csv[10] <- NULL ; csv[9] <- NULL #Eliminar d1920 y d1819 de la lista
+
+# Seleccionar datos de interés en la lista
+csv <- lapply(csv, select, Date:FTR, BbMx.2.5:BbAv.2.5.1)
+
+# Seleccionar datos de interés en los dataframe
+d1819S <- select(d1819, d1819.Date:d1819.FTR, d1819.BbMx.2.5:d1819.BbAv.2.5.1)
+d1920S <- select(d1920, d1920.Date:d1920.FTR, d1920.Max.2.5:d1920.Avg.2.5.1)
+d1920S <- select(d1920S, -d1920.Time)
+
+# Renombrar columnas de d1920S y d1819S
+d1819S <- dplyr::rename(d1819S, Date = d1819.Date, HomeTeam = d1819.HomeTeam, AwayTeam = d1819.AwayTeam,
+                        FTHG = d1819.FTHG, FTAG = d1819.FTAG, FTR = d1819.FTR, Max.2.5.O = d1819.BbMx.2.5,
+                        Max.2.5.U = d1819.BbMx.2.5.1, Avg.2.5.O = d1819.BbAv.2.5, Avg.2.5.U = d1819.BbAv.2.5.1)
+
+d1920S <- dplyr::rename(d1920S, Date = d1920.Date, HomeTeam = d1920.HomeTeam, AwayTeam = d1920.AwayTeam,
+                 FTHG = d1920.FTHG, FTAG = d1920.FTAG, FTR = d1920.FTR, Max.2.5.O = d1920.Max.2.5,
+                 Max.2.5.U = d1920.Max.2.5.1, Avg.2.5.O = d1920.Avg.2.5, Avg.2.5.U = d1920.Avg.2.5.1)
+# Terminamos de depurar los datos de d1920S y d1819S
+
+# Continuamos, ahora, depurando d1018S
+# Mutar la lista a un dataframe con todos sus datos
+d1018S <- ldply (csv, data.frame) #Se crea una columna .id #Función de la paquetería plyr
+class(d1018S); summary (d1018S)
+
+d1018S <- d1018S[,-1] #Eliminar la columna .id
+summary (d1018S)
+# Terminamos de depurar los datos de d1018S
+
+# Pasamos las fechas de tipo character a tipo fecha
+d1018S <- mutate(d1018S, Date = as.Date(Date, format = "%d/%m/%y")) #Para string dd/mm/aa
+d1819S <- mutate(d1819S, Date = as.Date(Date, format = "%d/%m/%Y")) #Para string dd/mm/aaaa
+d1920S <- mutate(d1920S, Date = as.Date(Date, format = "%d/%m/%Y")) #Para string dd/mm/aaaa
+
+summary(d1018S); summary(d1819S); summary(d1920) #Última verificación de los datos
+
+# Renombrar columnas de d1019S
+d1018S <- dplyr::rename(d1018S,  Max.2.5.O = BbMx.2.5, 
+                        Avg.2.5.O = BbAv.2.5, 
+                        Max.2.5.U = BbMx.2.5.1,
+                        Avg.2.5.U = BbAv.2.5.1)
 
 # Ordenamos las columnas
 
-d1019S <- select(d1019S, colnames(d1920S))
+d1018S <- select(d1018S, colnames(d1920S))
+d1819S <- select(d1819S, colnames(d1920S))
 
-# Volvemos a unir
+# Unión de todos los datos
 
-d1020S <- rbind(d1019S, d1920S)
+d1020S <- rbind(d1018S, d1819S, d1920S)
+head(d1020S); tail(d1020S) #Para verificar que abarca la información de 2010 a 2020
 
 # Renombramos
 
@@ -198,10 +203,10 @@ as <- momio$away.score
 # Probabilidades condicionales
 
 mean(phs + pas > 3) # proporción de partidos con más de tres goles según el modelo
-mean(phs + pas > 3 & hs + as > 2.5)/mean(phs + pas > 3) 
+pro.2.5.O <- mean(phs + pas > 3 & hs + as > 2.5)/mean(phs + pas > 3) 
 # probabilidad condicional estimada de ganar en over 2.5
 mean(phs + pas < 2.1) # proporción de partidos con menos de 2.1 goles según el modelo
-mean(phs + pas < 2.1 & hs + as < 2.5)/mean(phs + pas < 2.1) 
+prob.2.5U <- mean(phs + pas < 2.1 & hs + as < 2.5)/mean(phs + pas < 2.1) 
 # probabilidad condicional estimada de ganar en under 2.5
 
 # Juegos con momios máximos
@@ -228,8 +233,8 @@ g <- data.frame(Num_Ap = 1:length(g), Capital = g)
 p <- ggplot(g, aes(x=Num_Ap, y=Capital)) + geom_line( color="purple") + geom_point() +
   labs(x = "Número de juego", 
        y = "Capital",
-       title = "Realizando una secuencia de juegos") +
-  theme(plot.title = element_text(size=12))  +
+       title = "Capital obtenida tras realizar apuestas con el monto máximo posible") +
+  theme(text = element_text(size=16))  +
   theme(axis.text.x = element_text(face = "bold", color="blue" , size = 10, angle = 25, hjust = 1),
         axis.text.y = element_text(face = "bold", color="blue" , size = 10, angle = 25, hjust = 1))  # color, ángulo y estilo de las abcisas y ordenadas 
 p
@@ -256,8 +261,8 @@ g <- data.frame(Num_Ap = 1:length(g), Capital = g)
 p <- ggplot(g, aes(x=Num_Ap, y=Capital)) + geom_line( color="purple") + geom_point() +
   labs(x = "Número de juego", 
        y = "Capital",
-       title = "Realizando una secuencia de juegos") +
-  theme(plot.title = element_text(size=12))  +
+       title = "Capital obtenida tras realizar apuestas con el monto promedio") +
+  theme(text = element_text(size=16))  +
   theme(axis.text.x = element_text(face = "bold", color="blue" , size = 10, angle = 25, hjust = 1),
         axis.text.y = element_text(face = "bold", color="blue" , size = 10, angle = 25, hjust = 1))  # color, ángulo y estilo de las abcisas y ordenadas 
 p

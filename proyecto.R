@@ -4,13 +4,18 @@
 # 1. Descárgalo del CRAN https://cran.r-project.org/src/contrib/Archive/fbRanks/fbRanks_2.0.tar.gz
 # 2. Instala igraphs install.packages("igraph")
 # 3. install.packages("path_absoluta_del_archivo", repos = NULL, type = "source")
+
+install.packages("D:/ABEL/Documents/S9/fbRanks", repos = NULL, type = "source")
+install.packages("plyr") #Para pasar los datos de una lista cuyos objetos tienen la misma longitud a un dataframe
+
 library(fbRanks)
+library(plyr) #Importante que se lea antes de dplyr
 library(dplyr)
 library(ggplot2)
 
 # Colocar el directorio de trabajo según corresponda
 
-setwd("/Users/juanmastd/Documents/Yo/Becas/Becas Santander/BEDU/Ciencia de Datos/Fase 2/Módulo 1/bedu-equipo4-dataScience-FP")
+setwd("/cloud/project")
 
 # Descarga de archivos
 # https://www.football-data.co.uk/spainm.php
@@ -26,7 +31,9 @@ u1718 <- "https://www.football-data.co.uk/mmz4281/1718/SP1.csv"
 u1819 <- "https://www.football-data.co.uk/mmz4281/1819/SP1.csv"
 u1920 <- "https://www.football-data.co.uk/mmz4281/1920/SP1.csv"
 
-#RawData <- "C:\\\"
+rawData <- "/cloud/project/soccerData" #Path donde se guardarán los archivos
+setwd(rawData)
+
 download.file(url = u1011, destfile ="SP1-1011.csv", mode = "wb")
 download.file(url = u1112, destfile ="SP1-1112.csv", mode = "wb")
 download.file(url = u1213, destfile ="SP1-1213.csv", mode = "wb")
@@ -40,71 +47,60 @@ download.file(url = u1920, destfile ="SP1-1920.csv", mode = "wb")
 
 # Lectura de datos
 
-#lista <- lapply(list.files(path = RawData), read.csv)
-
-# Procesamiento de datos
-
-#lista <- lapply(lista, select, Date:FTR)
-
-d1011 <- read.csv("SP1-1011.csv")
-d1112 <- read.csv("SP1-1112.csv")
-d1213 <- read.csv("SP1-1213.csv")
-d1314 <- read.csv("SP1-1314.csv")
-d1415 <- read.csv("SP1-1415.csv")
-d1516 <- read.csv("SP1-1516.csv")
-d1617 <- read.csv("SP1-1617.csv")
-d1718 <- read.csv("SP1-1718.csv")
-d1819 <- read.csv("SP1-1819.csv")
-d1920 <- read.csv("SP1-1920.csv")
-
-#Agregar variable de FTR
-d1011S <- select(d1011, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1112S <- select(d1112, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1213S <- select(d1213, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1314S <- select(d1314, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1415S <- select(d1415, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1516S <- select(d1516, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1617S <- select(d1617, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1718S <- select(d1718, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1819S <- select(d1819, Date:FTR, BbMx.2.5:BbAv.2.5.1)
-d1920S <- select(d1920, Date:FTR, Max.2.5:Avg.2.5.1)
-d1920S <- select(d1920S, -Time)
-#colnames(d1718S); colnames(d1819S); colnames(d1920S)
-
-# Arreglamos las fechas
-d1011S <- mutate(d1011S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1112S <- mutate(d1112S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1213S <- mutate(d1213S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1314S <- mutate(d1314S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1415S <- mutate(d1415S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1516S <- mutate(d1516S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1617S <- mutate(d1617S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1718S <- mutate(d1718S, Date = as.Date(Date, format = "%d/%m/%y"))
-d1819S <- mutate(d1819S, Date = as.Date(Date, format = "%d/%m/%Y"))
-d1920S <- mutate(d1920S, Date = as.Date(Date, format = "%d/%m/%Y"))
-
-# Unimos de d1415S a d1819S
-
-d1019S <- rbind(d1011S, d1112S, d1213S, d1314S, d1415S, d1516S, d1617S, d1718S, d1819S)
+csv <- lapply(list.files(path = rawData, pattern = "*.csv"), read.csv)
+class(csv)
 
 # Renombrar columnas
-d1019S <- dplyr::rename(d1019S,  Max.2.5.O = BbMx.2.5, 
-                 Avg.2.5.O = BbAv.2.5, 
-                 Max.2.5.U = BbMx.2.5.1,
-                 Avg.2.5.U = BbAv.2.5.1)
+names(csv) <- c("d1011", "d1112", "d1213", "d1314", "d1415", "d1516", "d1617", "d1718", "d1819", "d1920")
 
-d1920S <- dplyr::rename(d1920S,  Max.2.5.O = Max.2.5, 
-                 Avg.2.5.O = Avg.2.5, 
-                 Max.2.5.U = Max.2.5.1,
-                 Avg.2.5.U = Avg.2.5.1)
+###### Procesamiento de datos ######
+d1920 <- as.data.frame(csv[10]) #Obtener los datos de d1920 como dataframe
+class(d1920); summary(d1920)
+
+csv[10] <- NULL #Eliminar d1920 de la lista
+
+# Seleccionar datos de interés en la lista
+csv <- lapply(csv, select, Date:FTR, BbMx.2.5:BbAv.2.5.1)
+
+# Seleccionar datos de interés en el dataframe
+d1920S <- select(d1920, d1920.Date:d1920.FTR, d1920.Max.2.5:d1920.Avg.2.5.1)
+d1920S <- select(d1920S, -d1920.Time)
+
+# Renombrar columnas de d1920S
+d1920S <- dplyr::rename(d1920S, Date = d1920.Date, HomeTeam = d1920.HomeTeam, AwayTeam = d1920.AwayTeam,
+                 FTHG = d1920.FTHG, FTAG = d1920.FTAG, FTR = d1920.FTR, Max.2.5.O = d1920.Max.2.5,
+                 Max.2.5.U = d1920.Max.2.5.1, Avg.2.5.O = d1920.Avg.2.5, Avg.2.5.U = d1920.Avg.2.5.1)
+# Terminamos de depurar los datos de d1920S
+
+# Continuamos, ahora, depurando d1019S
+# Mutar la lista a un dataframe con todos sus datos
+d1019S <- ldply (csv, data.frame) #Se crea una columna .id #Función de la paquetería plyr
+class(d1019S); summary (d1019S)
+
+d1019S <- d1019S[,-1] #Eliminar la columna .id
+summary (d1019S)
+# Terminamos de depurar los datos de d1019S
+
+# Pasamos las fechas de tipo character a tipo fecha
+d1019S <- mutate(d1019S, Date = as.Date(Date, format = "%d/%m/%y"))
+d1920S <- mutate(d1920S, Date = as.Date(Date, format = "%d/%m/%Y"))
+
+summary(d1019S); summary(d1920S) #Última verificación de los datos
+
+# Renombrar columnas de d1019S
+d1019S <- dplyr::rename(d1019S,  Max.2.5.O = BbMx.2.5, 
+                        Avg.2.5.O = BbAv.2.5, 
+                        Max.2.5.U = BbMx.2.5.1,
+                        Avg.2.5.U = BbAv.2.5.1)
 
 # Ordenamos las columnas
 
 d1019S <- select(d1019S, colnames(d1920S))
 
-# Volvemos a unir
+# Unión de todos los datos
 
 d1020S <- rbind(d1019S, d1920S)
+head(d1020S); tail(d1020S) #Para verificar que abarca la información de 2010 a 2020
 
 # Renombramos
 
@@ -116,6 +112,9 @@ d1020S <- dplyr::rename(d1020S, date = Date, home.team = HomeTeam, home.score = 
 data <- select(d1020S, date, home.team, home.score, away.team, away.score, FTR:Avg.2.5.U) # Este data frame contiene todos los datos necesarios
 
 head(data, n = 2L); tail(data, n = 2L)
+
+#Reinicio de directorio origen
+setwd("/cloud/project")
 
 #Escribe los datos en soccer.csv.
 smallData <- select(data, date, home.team, home.score, away.team, away.score)
@@ -139,7 +138,9 @@ ranking <- rank.teams(scores=anotaciones, teams=equipos,
 #Predice los resultados para la última fecha del vector (2020-07-19)
 predict(ranking, date=fechas[n])
 
-#Added FTR - original
+# Data frames de partidos y equipos
+
+#Added FTR
 md <- data %>% select(date:FTR)
 write.csv(md, "match.data.csv", row.names = FALSE)
 df <- create.fbRanks.dataframes(scores.file = "match.data.csv")

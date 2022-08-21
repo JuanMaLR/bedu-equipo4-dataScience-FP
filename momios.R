@@ -117,9 +117,29 @@ data <- select(d1020S, date, home.team, home.score, away.team, away.score, FTR:A
 
 head(data, n = 2L); tail(data, n = 2L)
 
-# Data frames de partidos y equipos
+#Escribe los datos en soccer.csv.
+smallData <- select(data, date, home.team, home.score, away.team, away.score)
+write.csv(smallData, file="soccer.csv", row.names = FALSE)
 
-#Added FTR
+#Importa datos de soccer.csv con create.fbRanks.dataframes.
+listasoccer <- create.fbRanks.dataframes(scores.file = "soccer.csv")
+
+#Separamos los data frames de anotaciones, equipos y fechas.
+anotaciones <- listasoccer$scores
+equipos <- listasoccer$teams
+#Guarda fechas diferentes y obtiene la longitud del vector.
+fechas <- unique(data$date) 
+n <- length(fechas)
+
+#Obtenemos el ranking de los equipos desde 2010-08-28 al 2020-07-16.
+ranking <- rank.teams(scores=anotaciones, teams=equipos,
+                      max.date = fechas[n], 
+                      min.date = fechas[1],
+                      date.format = "%Y-%m-%d")
+#Predice los resultados para la última fecha del vector (2020-07-19)
+predict(ranking, date=fechas[n])
+
+#Added FTR - original
 md <- data %>% select(date:FTR)
 write.csv(md, "match.data.csv", row.names = FALSE)
 df <- create.fbRanks.dataframes(scores.file = "match.data.csv")

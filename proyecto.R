@@ -3,9 +3,8 @@
 #Para instalar fbRanks: 
 # 1. Descárgalo del CRAN https://cran.r-project.org/src/contrib/Archive/fbRanks/fbRanks_2.0.tar.gz
 # 2. Instala igraphs install.packages("igraph")
-# 3. install.packages("path_absoluta_del_archivo", repos = NULL, type = "source")
+# 3. install.packages("https://cran.r-project.org/src/contrib/Archive/fbRanks/fbRanks_2.0.tar.gz", repos = NULL, type = "source")
 
-install.packages("D:/ABEL/Documents/S9/fbRanks", repos = NULL, type = "source")
 install.packages("plyr") #Para pasar los datos de una lista cuyos objetos tienen la misma longitud a un dataframe
 
 library(fbRanks)
@@ -110,7 +109,6 @@ d1020S <- dplyr::rename(d1020S, date = Date, home.team = HomeTeam, home.score = 
 
 #Added FTR
 data <- select(d1020S, date, home.team, home.score, away.team, away.score, FTR:Avg.2.5.U) # Este data frame contiene todos los datos necesarios
-
 head(data, n = 2L); tail(data, n = 2L)
 
 #Reinicio de directorio origen
@@ -127,15 +125,15 @@ listasoccer <- create.fbRanks.dataframes(scores.file = "soccer.csv")
 anotaciones <- listasoccer$scores
 equipos <- listasoccer$teams
 #Guarda fechas diferentes y obtiene la longitud del vector.
-fechas <- unique(data$date) 
+fechas <- unique(anotaciones$date) 
 n <- length(fechas)
 
-#Obtenemos el ranking de los equipos desde 2010-08-28 al 2020-07-16.
+#Obtenemos el ranking de los equipos desde 2010-08-28 al 2020-12-22.
 ranking <- rank.teams(scores=anotaciones, teams=equipos,
-                      max.date = fechas[n], 
+                      max.date = fechas[n-1], 
                       min.date = fechas[1],
                       date.format = "%Y-%m-%d")
-#Predice los resultados para la última fecha del vector (2020-07-19)
+#Predice los resultados para la última fecha del vector (2020-12-23)
 predict(ranking, date=fechas[n])
 
 # Data frames de partidos y equipos

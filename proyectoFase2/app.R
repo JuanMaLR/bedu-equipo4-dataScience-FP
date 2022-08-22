@@ -4,7 +4,7 @@ library(dplyr)
 library(shinydashboard)
 library(shinythemes)
 
-setwd('/Users/juanmastd/Documents/Yo/Becas/Becas Santander/BEDU/Ciencia de Datos/Fase 2/Módulo 1/bedu-equipo4-dataScience-FP')
+#setwd('/Users/juanmastd/Documents/Yo/Becas/Becas Santander/BEDU/Ciencia de Datos/Fase 2/Módulo 1/bedu-equipo4-dataScience-FP')
 md <- read.csv("match.data.csv")
 
 ui <- fluidPage(
